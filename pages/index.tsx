@@ -1,23 +1,25 @@
-import Head from 'next/head';
-import Layout, { siteTitle } from '../components/layout';
-import Hero from '../components/hero';
-import Features from '../components/features';
-import FeaturesBlocks from '../components/featuresBlocks';
-import Testimonials from '../components/testimonials';
-import Newsletter from '../components/newsletter';
+import type { User } from '../interfaces';
+import useSwr from 'swr';
+import Link from 'next/link';
 
-export default function Home() {
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export default function Index() {
+    const { data, error, isLoading } = useSwr<User[]>('/api/users', fetcher);
+
+    if (error) return <div>Failed to load users</div>;
+    if (isLoading) return <div>Loading...</div>;
+    if (!data) return null;
+
     return (
-        <Layout home>
-            <Head>
-                <title>{siteTitle}</title>
-            </Head>
-
-            <Hero />
-            <Features />
-            <FeaturesBlocks />
-            <Testimonials />
-            <Newsletter />
-        </Layout>
+        <ul>
+            {data.map((user) => (
+                <li key={user.id}>
+                    <Link href="/user/[id]" as={`/user/${user.id}`}>
+                        {user.name ?? `User ${user.id}`}
+                    </Link>
+                </li>
+            ))}
+        </ul>
     );
 }
