@@ -1,4 +1,6 @@
-export type User = {
-    id: number;
-    name?: string;
+export type IUser = {
+    _id: string;
+    name: string;
+    email: string;
+    avatar?: string;
 };
