@@ -1,6 +1,7 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
+import type { IUser } from '@interfaces';
 
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
     {
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
@@ -14,4 +15,5 @@ const userSchema = new Schema(
     }
 );
 
-export const User = model('User', userSchema);
+export const User =
+    (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', userSchema);
