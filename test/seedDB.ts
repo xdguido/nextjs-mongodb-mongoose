@@ -2,19 +2,19 @@ import fs from 'fs';
 import util from 'util';
 import path from 'path';
 import mongoose from 'mongoose';
+import user from './seeds/user.seed';
 
 const readDir = util.promisify(fs.readdir);
 
 const toTitleCase = (str: string) => {
     return str.replace(/\w\S*/g, (txt) => {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
     });
 };
 
-const seedFilesPath = path.resolve(__dirname, '../../../../test/seeds');
-
 // Load seeds of all models
 export default async function seedDB(runMongoSaveMiddleware: boolean = false) {
+    const seedFilesPath = path.resolve(process.cwd(), 'test/seeds');
     const dir = await readDir(seedFilesPath);
     const seedFiles = dir.filter((f) => f.endsWith('.seed.ts'));
 
@@ -24,10 +24,18 @@ export default async function seedDB(runMongoSaveMiddleware: boolean = false) {
         const model = mongoose.models[modelName];
 
         if (!model) throw new Error(`Cannot find Model '${modelName}'`);
-        const fileContents = await import(path.join(seedFilesPath, file));
+        let fileContents;
+
+        switch (fileName) {
+            case 'user':
+                fileContents = user;
+                break;
+            default:
+                return console.log('No seeds found');
+        }
 
         runMongoSaveMiddleware
-            ? await model.create(fileContents.default)
-            : await model.insertMany(fileContents.default);
+            ? await model.create(fileContents)
+            : await model.insertMany(fileContents);
     }
 }

@@ -2,11 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { User } from '@models/User';
 import connectDB from '../../../utils/connectDB';
 
-connectDB();
-
 export default async function userHandler(req: NextApiRequest, res: NextApiResponse) {
     const { query, method } = req;
-
+    await connectDB();
     switch (method) {
         case 'GET':
             // Get data from your database
