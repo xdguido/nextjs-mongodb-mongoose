@@ -9,7 +9,7 @@ export default async function connectDB() {
         const conn = await mongoose.connect('mongodb://localhost:27017/nextjs-mongodb-demo');
         if (conn) {
             console.log(colors.cyan(`MongoDB Connected: ${conn.connection.host}`));
-            seedDB(true);
+            await seedDB(true);
         }
     }
 }
